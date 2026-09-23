@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>핏업 FIT UP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+:root{
+  --bg:#0B0F0D; --card:#151C19; --card2:#1D2622; --line:#28332E; --ink:#F2F5F3; --muted:#8E9C95;
+  --accent:#FF5A1F; --accent2:#FFB020; --teal:#3FD0B5; --gold:#FFC24D; --violet:#A3A3F5; --red:#FF6B5C;
+  --r:18px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR","Noto Sans",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:15px;line-height:1.55;word-break:keep-all}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input{font:inherit}
+a{color:inherit;text-decoration:none}
+.num{font-variant-numeric:tabular-nums}
+#app{max-width:480px;margin:0 auto;min-height:100vh;padding:14px 16px calc(92px + env(safe-area-inset-bottom,0px))}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.stack{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--card);border-radius:var(--r);padding:16px}
+.sec-title{font-size:13px;font-weight:700;color:var(--muted);margin:22px 2px 10px;display:flex;justify-content:space-between;align-items:baseline}
+svg.i{width:20px;height:20px;flex:none}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:5px 10px;border-radius:99px;white-space:nowrap}
+.chip svg{width:14px;height:14px}
+.c-acc{background:rgba(255,90,31,.16);color:#FF8A5C}
+.c-teal{background:rgba(63,208,181,.14);color:var(--teal)}
+.c-gold{background:rgba(255,194,77,.14);color:var(--gold)}
+.c-vio{background:rgba(163,163,245,.14);color:var(--violet)}
+.c-mute{background:var(--card2);color:var(--muted)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border-radius:16px;padding:15px;font-weight:700;font-size:16px;transition:transform .1s}
+.btn:active{transform:scale(.98)}
+.btn svg{width:20px;height:20px}
+.btn-acc{background:var(--accent);color:#fff}
+.btn-ghost{background:var(--card2)}
+.btn-teal{background:var(--teal);color:#06231d}
+.btn[disabled]{opacity:.5;pointer-events:none}
+:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+
+/* header */
+.top{display:flex;justify-content:space-between;align-items:flex-start;margin:6px 2px 14px}
+.top h1{font-size:21px;font-weight:900;margin:2px 0 0;letter-spacing:-.02em}
+
+/* player card */
+.pcard{position:relative;overflow:hidden;border-radius:22px;padding:18px;color:#fff;background:linear-gradient(135deg,var(--t1),var(--t2))}
+.pcard::after{content:"";position:absolute;right:-50px;top:-50px;width:170px;height:170px;border-radius:50%;border:18px solid rgba(255,255,255,.14)}
+.pcard .lv{font-size:40px;font-weight:900;line-height:1;letter-spacing:-.03em}
+.pcard .nm{font-size:17px;font-weight:700;margin-top:4px}
+.pcard .tier{font-size:11px;font-weight:700;letter-spacing:.12em;opacity:.8;text-transform:uppercase}
+.xpbar{height:10px;border-radius:99px;background:rgba(0,0,0,.28);overflow:hidden;margin-top:14px}
+.xpbar i{display:block;height:100%;border-radius:99px;background:#fff;transition:width 1s ease}
+.dark .xpbar{background:var(--card2)} .dark .xpbar i{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.t-bronze{--t1:#6B3B22;--t2:#B8744A}
+.t-silver{--t1:#4F5B57;--t2:#98A6A1}
+.t-gold{--t1:#8A5B00;--t2:#E6B325}
+.t-platinum{--t1:#1E6C6A;--t2:#6FCFC8}
+.t-black{--t1:#0A0A0A;--t2:#2E3431}
+.t-black .lv,.t-black .nm{color:var(--gold)}
+
+/* mission rows */
+.mrow{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:16px;padding:12px 14px;width:100%;text-align:left}
+.mi{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;flex:none}
+.mi svg{width:24px;height:24px}
+.mrow .t{flex:1;min-width:0}
+.mrow .t b{display:block;font-size:15px}
+.mrow .t small{font-size:12px;color:var(--muted)}
+.chk{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;flex:none}
+.chk.on{background:var(--teal);border-color:var(--teal)}
+.chk svg{width:15px;height:15px;color:#06231d}
+.habits{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.habit{background:var(--card);border-radius:16px;padding:12px 6px;text-align:center;font-size:12px;color:var(--muted);transition:background .2s}
+.habit svg{width:26px;height:26px;display:block;margin:0 auto 4px}
+.habit.on{background:rgba(63,208,181,.14);color:var(--teal);font-weight:700}
+.bonus{background:linear-gradient(135deg,#2A1B3D,#1B1B33);border:1px solid #33335A;border-radius:18px;padding:14px;display:flex;gap:12px;align-items:center}
+.msg{background:rgba(255,194,77,.1);border:1px solid rgba(255,194,77,.3);border-radius:16px;padding:12px 14px;font-size:14px;display:flex;gap:10px;align-items:flex-start}
+
+/* tab bar */
+.tabbar{position:fixed;left:0;right:0;bottom:0;background:rgba(11,15,13,.94);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px));z-index:10}
+.tabbar .in{max-width:480px;margin:0 auto;display:flex;justify-content:space-around}
+.tabbar button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--muted);padding:4px 14px}
+.tabbar button.on{color:var(--accent)}
+.tabbar svg{width:23px;height:23px}
+
+/* exercise detail */
+.back{display:flex;align-items:center;gap:4px;color:var(--muted);font-size:14px;padding:6px 0;margin-bottom:6px}
+.illu{background:var(--card);border-radius:22px;display:grid;place-items:center;padding:10px}
+.points{counter-reset:p;display:flex;flex-direction:column;gap:8px}
+.points div{display:flex;gap:10px;font-size:15px}
+.points div::before{counter-increment:p;content:counter(p);flex:none;width:24px;height:24px;border-radius:8px;background:rgba(255,90,31,.16);color:#FF8A5C;display:grid;place-items:center;font-weight:900;font-size:13px}
+
+/* camera */
+.camwrap{position:fixed;inset:0;background:#000;z-index:50;display:flex;flex-direction:column}
+.stage{position:relative;flex:1;overflow:hidden}
+.stage video,.stage canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mirror{transform:scaleX(-1)}
+.hud{position:absolute;inset:0;pointer-events:none;padding:calc(12px + env(safe-area-inset-top,0px)) 14px 14px}
+.hud .count{font-size:64px;font-weight:900;line-height:1;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.hud .count small{font-size:20px;color:#cfd8d3;font-weight:500}
+.hud .score{position:absolute;right:14px;top:calc(14px + env(safe-area-inset-top,0px));text-align:right;font-size:12px;color:#cfd8d3;text-shadow:0 1px 6px rgba(0,0,0,.7)}
+.hud .score b{display:block;font-size:30px;color:var(--teal)}
+.hud .fb{position:absolute;left:14px;right:14px;bottom:14px;border-radius:16px;padding:12px 14px;font-weight:700;font-size:16px;display:flex;gap:8px;align-items:center;transition:background .2s}
+.fb.bad{background:rgba(255,90,31,.93);color:#fff}
+.fb.good{background:rgba(63,208,181,.93);color:#06231d}
+.fb.info{background:rgba(20,26,23,.88);color:#fff}
+.hud .center{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.hud .big{font-size:120px;font-weight:900;text-shadow:0 4px 30px rgba(0,0,0,.6)}
+.hud .goal{background:rgba(255,194,77,.95);color:#2a1d00;border-radius:99px;padding:8px 18px;font-weight:900;font-size:18px}
+.camctl{display:flex;gap:10px;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));background:#0B0F0D}
+.camctl .sq{width:54px;flex:none;background:var(--card2);border-radius:16px;display:grid;place-items:center}
+.camctl .sq svg{width:22px;height:22px}
+.privacy{position:absolute;left:14px;top:calc(88px + env(safe-area-inset-top,0px));font-size:11px;color:#FF8A5C;display:flex;align-items:center;gap:5px;text-shadow:0 1px 4px #000}
+.privacy i{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:80;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+.sheet{background:var(--card);width:100%;max-width:480px;border-radius:26px 26px 0 0;padding:22px 18px calc(18px + env(safe-area-inset-bottom,0px));max-height:92vh;overflow:auto}
+.center-modal{align-items:center;padding:16px}
+.center-modal .sheet{border-radius:26px}
+@keyframes fade{from{opacity:0}}
+.stepper{display:flex;align-items:center;justify-content:center;gap:16px;margin:18px 0}
+.stepper button{width:52px;height:52px;border-radius:16px;background:var(--card2);font-size:26px;font-weight:700}
+.stepper input{width:120px;text-align:center;font-size:40px;font-weight:900;background:none;border:0;color:var(--ink);border-bottom:2px solid var(--line)}
+.reward{text-align:center}
+.reward .xp{font-size:56px;font-weight:900;color:var(--gold);line-height:1.1;animation:pop .6s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(.3);opacity:0}}
+.alines{display:flex;flex-direction:column;gap:6px;margin:14px 0;text-align:left}
+.alines div{display:flex;justify-content:space-between;background:var(--card2);border-radius:12px;padding:9px 12px;font-size:14px}
+.alines b{color:var(--gold)}
+.newbadge{display:flex;gap:12px;align-items:center;background:var(--card2);border-radius:16px;padding:10px 12px;text-align:left;margin-top:8px;animation:pop .7s .2s both cubic-bezier(.2,1.6,.4,1)}
+.newbadge svg{width:64px;height:64px;flex:none}
+.lvup{border-radius:18px;padding:14px;margin-top:10px;animation:pop .7s .1s both cubic-bezier(.2,1.6,.4,1)}
+
+/* badges */
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bdg{background:var(--card);border-radius:16px;padding:12px 6px;text-align:center;font-size:12px}
+.bdg svg{width:64px;height:64px;display:block;margin:0 auto 4px}
+.bdg.lock svg{opacity:.3}
+.bdg .p{height:4px;border-radius:9px;background:var(--card2);margin:6px 10px 0;overflow:hidden}
+.bdg .p i{display:block;height:100%;background:var(--muted)}
+.bdg small{display:block;color:var(--muted);font-size:11px}
+
+/* body */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:var(--card);border-radius:16px;padding:12px 14px}
+.stat small{font-size:12px;color:var(--muted)}
+.stat b{display:block;font-size:24px;font-weight:900;letter-spacing:-.02em}
+.stat b span{font-size:13px;font-weight:500;color:var(--muted)}
+.d-good{color:var(--teal);font-size:12px;font-weight:700}
+.d-flat{color:var(--muted);font-size:12px;font-weight:700}
+.seg{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.seg button{white-space:nowrap;font-size:13px;padding:6px 12px;border-radius:99px;background:var(--card2);color:var(--muted)}
+.seg button.on{background:var(--ink);color:var(--bg);font-weight:700}
+
+/* record */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal div{aspect-ratio:1;border-radius:8px;background:var(--card2);display:grid;place-items:center;font-size:10px;color:var(--muted)}
+.cal div.a{background:rgba(255,90,31,.35);color:#fff}
+.cal div.f{background:var(--accent);color:#fff;font-weight:700}
+.cal div.today{outline:2px solid var(--ink)}
+.cal .h{background:none;aspect-ratio:auto;font-size:11px}
+.cmp{display:flex;flex-direction:column;gap:14px}
+.bars{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.bar{display:flex;align-items:center;gap:8px;font-size:12px}
+.bar span{width:44px;color:var(--muted);flex:none}
+.bar i{display:block;height:12px;border-radius:6px;min-width:4px}
+.bar em{font-style:normal;font-weight:700}
+
+/* login */
+.login{min-height:88vh;display:flex;flex-direction:column;justify-content:center;gap:18px}
+.brand{font-size:44px;font-weight:900;letter-spacing:-.04em;line-height:1}
+.brand span{color:var(--accent)}
+.codebox{display:flex;gap:8px;justify-content:center}
+.codein{width:100%;text-align:center;font-size:34px;font-weight:900;letter-spacing:.35em;text-transform:uppercase;padding:16px;border-radius:18px;background:var(--card);border:2px solid var(--line);color:var(--ink)}
+.codein:focus{border-color:var(--accent);outline:none}
+.toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:99px;font-weight:700;font-size:14px;z-index:99;max-width:90vw;text-align:center;animation:fade .2s}
+.loading{display:grid;place-items:center;min-height:60vh;color:var(--muted)}
+.spin{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--accent);animation:sp 0.8s linear infinite;margin:0 auto 10px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-flame" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4 0 7-2.8 7-7 0-4-3-6-4-10-2 2-3 4-3 6-1-1-2-2-2-4-3 3-5 5.5-5 8 0 4.2 3 7 7 7z"/></symbol>
+<symbol id="i-cam" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 7.2a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.7.5A2.7 2.7 0 0 0 2.4 7.2 28 28 0 0 0 2 12a28 28 0 0 0 .4 4.8 2.7 2.7 0 0 0 1.9 1.9c1.7.5 7.7.5 7.7.5s6 0 7.7-.5a2.7 2.7 0 0 0 1.9-1.9A28 28 0 0 0 22 12a28 28 0 0 0-.4-4.8zM10 15V9l5.2 3z"/></symbol>
+<symbol id="i-drop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z"/></symbol>
+<symbol id="i-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-9 6-14 15-14 0 9-5 15-14 15"/><path d="M5 19 13 11"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M4 4l16 16"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7v9h-6v-6H9v6H3z"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><path d="M5 15l4-4 4 3 6-7"/></symbol>
+<symbol id="i-medal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l-2 6h-4z"/><circle cx="12" cy="15" r="6"/><path d="M12 12.5v5"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+<symbol id="i-timer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></symbol>
+<symbol id="i-squat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2"/><path d="M12 7l-2 6h5l1 7M10 13l-3 7M8 9h8"/></symbol>
+<symbol id="i-arm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16c2-6 5-9 9-9 1.5 0 2.5 1 2.5 2.3S14.5 12 13 12h-1"/><path d="M4 16c4 3 10 3 16-1-1-3-3-4-5-4"/></symbol>
+<symbol id="i-rope" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4v5M19 4v5"/><path d="M5 9c0 9 14 9 14 0"/></symbol>
+<symbol id="i-walk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="M11 21l2-6-2-3 1-5 3 3 3 1M9 11l2-4M13 15l3 6"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+<symbol id="i-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 8v5M12 16.5v.5"/><circle cx="12" cy="12" r="9"/></symbol>
+<symbol id="i-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="5" rx="1"/><path d="M5 13v8h14v-8M12 8v13M12 8S10 3 7.5 4.5 9 8 12 8zM12 8s2-5 4.5-3.5S15 8 12 8z"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="i-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></symbol>
+<symbol id="i-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/></symbol>
+<symbol id="i-flip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M9 13a3 3 0 0 1 5.2-2M15 13a3 3 0 0 1-5.2 2M14 9v2h-2M10 17v-2h2"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></symbol>
+<symbol id="i-rest" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M9 9h6M9 13h6M9 17h3"/></symbol>
+</defs></svg>
+
+<div id="app"><div class="loading"><div><div class="spin"></div>불러오는 중…</div></div></div>
+
+<script>
+/* ===== 설정 =====
+ * 학생 화면을 구글 앱스 스크립트로 열면 비워 두세요.
+ * GitHub Pages 등 다른 곳에 올릴 때만 웹 앱 주소(…/exec)를 넣으세요. */
+const API_URL = ''; // ← 따옴표 사이에 앱스 스크립트 웹 앱 주소(https://script.google.com/macros/s/…/exec)를 붙여 넣으세요
+const MP_VER = '0.10.14';
+const MP_BASE = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@' + MP_VER;
+const POSE_MODEL = 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task';
+
+/* ===== 서버 통신 ===== */
+function api(fn, ...args) {
+  return new Promise((resolve, reject) => {
+    if (window.google && google.script && google.script.run) {
+      google.script.run.withSuccessHandler(resolve).withFailureHandler(e => reject(e))[fn](...args);
+    } else if (API_URL) {
+      fetch(API_URL, { method: 'POST', body: JSON.stringify({ fn, args }) })
+        .then(r => r.json()).then(d => d.ok ? resolve(d.data) : reject(new Error(d.error))).catch(reject);
+    } else reject(new Error('서버 주소가 설정되지 않았어요.'));
+  });
+}
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) { } }
+};
+
+/* ===== 도우미 ===== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ic = (id, cls) => `<svg class="${cls || 'i'}"><use href="#i-${id}"/></svg>`;
+const errMsg = e => String((e && e.message) || e).replace(/^Error:\s*/, '').replace(/^Exception:\s*/, '');
+function toast(msg) {
+  document.querySelectorAll('.toast').forEach(x => x.remove());
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
+}
+const CAT_STYLE = {
+  lower: ['rgba(255,90,31,.16)', '#FF8A5C'], upper: ['rgba(255,194,77,.14)', '#FFC24D'],
+  core: ['rgba(63,208,181,.14)', '#3FD0B5'], cardio: ['rgba(163,163,245,.16)', '#A3A3F5'], flex: ['rgba(120,200,120,.16)', '#8FD68F']
+};
+const CAT_NAME = { lower: '하체', upper: '상체', core: '코어', cardio: '심폐', flex: '유연성' };
+const EX_ICON = { squat: 'squat', lunge: 'squat', pushup: 'arm', plank: 'timer', situp: 'timer', jack: 'bolt', rope: 'rope', walk: 'walk', stretch: 'leaf' };
+const BADGE_COLOR = { orange: ['#2B1A14', '#FF5A1F', '#FF8A5C'], gold: ['#2A221A', '#E6B325', '#FFC24D'], teal: ['#10251F', '#1FB597', '#3FD0B5'], violet: ['#1B1B33', '#7B7BEA', '#A3A3F5'] };
+const TIER_NAME = { bronze: 'Bronze', silver: 'Silver', gold: 'Gold', platinum: 'Platinum', black: 'Black' };
+const BADGE_ICON_MAP = { phone: 'phone', arm: 'arm', check: 'check', gift: 'gift', chart: 'chart', medal: 'medal' };
+
+function badgeSvg(b, locked) {
+  const c = locked ? ['#1A221E', '#3A4640', '#56645D'] : (BADGE_COLOR[b.color] || BADGE_COLOR.gold);
+  return `<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 4 71 22v36L40 76 9 58V22z" fill="${c[0]}" stroke="${c[1]}" stroke-width="3"/>
+    <path d="M40 14 62 27v26L40 66 18 53V27z" fill="${c[1]}" opacity=".12"/>
+    <svg x="25" y="25" width="30" height="30" style="color:${c[2]}"><use href="#i-${b.icon}"/></svg></svg>`;
+}
+
+/* ===== 운동 그림 (옆모습·앞모습 막대 인형) ===== */
+const FIGS = {
+  squat: { head: [132, 46], L: [[130, 59, 118, 98], [118, 98, 152, 104], [152, 104, 146, 136], [146, 136, 162, 136], [129, 66, 168, 70]], ghost: true },
+  lunge: { head: [100, 30], L: [[100, 42, 100, 84], [100, 84, 136, 92], [136, 92, 138, 134], [138, 134, 152, 134], [100, 84, 76, 116], [76, 116, 52, 128], [100, 52, 88, 70], [88, 70, 98, 82]] },
+  pushup: { head: [42, 86], L: [[54, 94, 122, 114], [122, 114, 150, 134], [150, 134, 182, 134], [58, 96, 58, 134]] },
+  plank: { head: [40, 92], L: [[52, 100, 170, 124], [170, 124, 176, 134], [52, 102, 52, 132], [52, 132, 78, 132]] },
+  situp: { head: [72, 60], L: [[80, 72, 110, 128], [110, 128, 140, 96], [140, 96, 166, 132], [166, 132, 180, 132], [82, 80, 98, 92]] },
+  jack: { head: [100, 22], L: [[100, 34, 100, 84], [100, 42, 70, 8], [100, 42, 130, 8], [100, 84, 76, 134], [100, 84, 124, 134]] },
+  rope: { head: [100, 22], L: [[100, 34, 100, 84], [100, 44, 80, 70], [80, 70, 72, 84], [100, 44, 120, 70], [120, 70, 128, 84], [100, 84, 94, 122], [100, 84, 106, 122]], extra: '<path d="M72 84 C 40 150, 160 150, 128 84" fill="none" stroke="#FFC24D" stroke-width="2.5"/><path d="M72 84 C 60 -30, 140 -30, 128 84" fill="none" stroke="#FFC24D" stroke-width="1.5" stroke-dasharray="4 5" opacity=".6"/>' },
+  walk: { head: [100, 24], L: [[100, 36, 97, 82], [97, 82, 112, 106], [112, 106, 118, 134], [97, 82, 88, 108], [88, 108, 76, 132], [100, 46, 114, 68], [100, 46, 86, 68]] },
+  stretch: { head: [130, 90], L: [[72, 128, 124, 98], [72, 128, 176, 130], [120, 102, 170, 124]] }
+};
+function figure(key) {
+  const f = FIGS[key] || FIGS.squat;
+  const line = (l, c, w) => `<line x1="${l[0]}" y1="${l[1]}" x2="${l[2]}" y2="${l[3]}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`;
+  const ghost = f.ghost ? `<g opacity=".55"><circle cx="48" cy="22" r="10" fill="#56645D"/>${[[48, 34, 48, 80], [48, 80, 50, 108], [50, 108, 48, 136], [48, 44, 44, 76]].map(l => line(l, '#56645D', 5)).join('')}</g><path d="M72 70h16" stroke="#8E9C95" stroke-width="2"/><path d="M86 66l5 4-5 4" fill="none" stroke="#8E9C95" stroke-width="2"/>` : '';
+  return `<svg viewBox="0 0 200 150" width="100%" style="max-height:190px" role="img" aria-label="동작 그림">
+    <line x1="10" y1="138" x2="190" y2="138" stroke="#2F3A35" stroke-width="2"/>${ghost}${f.extra || ''}
+    ${f.L.map(l => line(l, '#FF5A1F', 6)).join('')}<circle cx="${f.head[0]}" cy="${f.head[1]}" r="11" fill="#FF5A1F"/></svg>`;
+}
+
+/* ===== 상태 ===== */
+const S = { code: store.get('fitup_code'), home: null, view: 'home', exId: null, sound: store.get('fitup_sound') !== 'off', metric: null };
+
+function render() {
+  const app = $('#app');
+  if (!S.home) { app.innerHTML = viewLogin(); bindLogin(); return; }
+  const v = S.view;
+  let html = '';
+  if (v === 'home') html = viewHome();
+  else if (v === 'ex') html = viewExercise();
+  else if (v === 'record') html = viewRecord();
+  else if (v === 'body') html = viewBody();
+  else if (v === 'badges') html = viewBadges();
+  app.innerHTML = html + (v === 'ex' ? '' : tabbar());
+  window.scrollTo(0, 0);
+}
+function go(v, exId) { S.view = v; if (exId) S.exId = exId; render(); }
+
+function tabbar() {
+  const t = [['home', 'home', '오늘'], ['record', 'cal', '기록'], ['body', 'chart', '내 몸'], ['badges', 'medal', '배지']];
+  return `<nav class="tabbar"><div class="in">${t.map(x => `<button class="${S.view === x[0] ? 'on' : ''}" onclick="go('${x[0]}')">${ic(x[1])}${x[2]}</button>`).join('')}</div></nav>`;
+}
+
+/* ===== 로그인 ===== */
+function viewLogin() {
+  return `<div class="login">
+    <div><div class="brand">핏업 <span>FIT UP</span></div><p class="muted" style="margin:10px 0 0">어제의 나를 이기는 루틴.<br>선생님께 받은 내 코드를 입력하세요.</p></div>
+    <input id="code" class="codein" maxlength="6" autocomplete="off" autocapitalize="characters" placeholder="CODE" value="${esc(S.code || '')}" aria-label="학생 코드">
+    <button class="btn btn-acc" id="go">시작하기</button>
+    <p class="small muted" style="text-align:center">카메라 영상은 저장하거나 보내지 않아요. 내 기기 안에서만 동작을 분석해요.</p>
+  </div>`;
+}
+function bindLogin() {
+  const inp = $('#code'), btn = $('#go');
+  const submit = async () => {
+    const c = inp.value.trim().toUpperCase();
+    if (c.length < 3) { toast('코드를 입력해 주세요'); return; }
+    btn.disabled = true; btn.textContent = '확인 중…';
+    try { S.home = await api('studentHome', c); S.code = c; store.set('fitup_code', c); S.view = 'home'; render(); }
+    catch (e) { toast(errMsg(e)); btn.disabled = false; btn.textContent = '시작하기'; }
+  };
+  btn.onclick = submit; inp.onkeydown = e => { if (e.key === 'Enter') submit(); };
+}
+function logout() { store.set('fitup_code', null); S.code = null; S.home = null; render(); }
+
+/* ===== 홈 ===== */
+function playerCard(lv, extra) {
+  return `<div class="pcard t-${lv.tier}">
+    <div class="row between"><span class="tier">${TIER_NAME[lv.tier]} · 나의 선수 카드</span></div>
+    <div class="row" style="align-items:flex-end;gap:12px;margin-top:8px"><div class="lv num">Lv.${lv.level}</div><div class="nm">${esc(lv.name)}</div></div>
+    <div class="xpbar"><i style="width:${lv.pct}%"></i></div>
+    <div class="row between small num" style="margin-top:6px;opacity:.9"><span>${lv.xp.toLocaleString()} XP</span><span>${lv.next ? `다음 ${esc(lv.nextName)}까지 ${(lv.next - lv.xp).toLocaleString()} XP` : '최고 레벨 달성!'}</span></div>
+    ${extra || ''}
+  </div>`;
+}
+function viewHome() {
+  const h = S.home;
+  const d = new Date(h.today + 'T00:00:00');
+  const dateStr = `${d.getMonth() + 1}월 ${d.getDate()}일 ${'일월화수목금토'[d.getDay()]}요일`;
+  const todayXp = h.exercises.filter(e => !e.done).reduce((a, e) => a + 20 + (e.mode ? 15 : 0), 0) + h.habits.filter(x => !x.done).length * 5;
+  const exDone = h.exercises.filter(e => e.done).length, hbDone = h.habits.filter(x => x.done).length;
+  const total = h.exercises.length + h.habits.length, done = exDone + hbDone;
+  const msgs = h.messages.map(m => `<div class="msg">${ic('mail')}<div style="flex:1"><div class="small" style="color:var(--gold);font-weight:700">선생님의 메시지</div>${esc(m.text)}</div></div>`).join('');
+  const exRows = h.exercises.map(e => {
+    const cs = CAT_STYLE[e.cat] || CAT_STYLE.cardio;
+    const sub = e.done ? `완료 · ${e.doneValue}${esc(e.unit)}${e.doneScore ? ` · 자세 ${e.doneScore}점` : ''}` : (e.mode ? '카메라 인증 · 최대 +35 XP' : '스스로 체크 · +20 XP');
+    return `<button class="mrow" onclick="go('ex','${e.id}')">
+      <div class="mi" style="background:${cs[0]};color:${cs[1]}">${ic(EX_ICON[e.pic] || 'bolt')}</div>
+      <div class="t"><b>${esc(e.name)} ${e.target}${esc(e.unit)}</b><small>${sub}</small></div>
+      <div class="chk ${e.done ? 'on' : ''}">${e.done ? ic('check') : ''}</div></button>`;
+  }).join('');
+  const habits = h.habits.map(x => `<button class="habit ${x.done ? 'on' : ''}" onclick="toggleHabit('${x.id}',${x.done})" aria-pressed="${x.done}">${ic(x.icon)}${esc(x.name)}</button>`).join('');
+  const empty = !h.exercises.length ? `<div class="card muted" style="text-align:center">아직 목표가 없어요.<br>선생님이 목표를 정해 주면 여기에 나타나요.</div>` : '';
+  return `
+  <div class="top">
+    <div><div class="small muted">${dateStr}</div><h1>${esc(h.name)}, 오늘도 한 걸음</h1></div>
+    <span class="chip c-acc">${ic('flame')}${h.streak}일 연속</span>
+  </div>
+  <div class="stack">
+    ${msgs ? msgs + `<button class="small muted" style="text-align:right" onclick="readMsgs()">메시지 확인했어요</button>` : ''}
+    ${playerCard(h.level, `<div class="row" style="gap:6px;margin-top:14px;flex-wrap:wrap;position:relative;z-index:1">
+        <span class="chip" style="background:rgba(0,0,0,.25)">${ic('medal')}배지 ${h.badgeCount}개</span>
+        <span class="chip" style="background:rgba(0,0,0,.25)">${ic('check')}오늘 ${done}/${total}</span>
+        <span class="chip" style="background:rgba(0,0,0,.25)">${ic('rest')}쉬는 날 카드 ${h.restUsed ? '사용함' : '1장'}</span></div>`)}
+    ${total && done < total ? `<div class="small muted" style="margin:0 2px">오늘 남은 걸 모두 하면 최대 <b style="color:var(--gold)">+${todayXp + 20} XP</b> (모두 완료 보너스 포함)</div>` : ''}
+    ${total && done === total ? `<div class="card" style="background:rgba(63,208,181,.12);color:var(--teal);font-weight:700;text-align:center">${ic('sparkle')} 오늘 할 일을 모두 끝냈어요! 완벽한 하루</div>` : ''}
+  </div>
+  <div class="sec-title"><span>오늘의 운동${h.type ? ' · ' + esc(h.type) : ''}${h.stage ? ' · ' + esc(h.stage) : ''}</span><span>${exDone}/${h.exercises.length}</span></div>
+  <div class="stack" style="gap:8px">${exRows}${empty}</div>
+  ${h.habits.length ? `<div class="sec-title"><span>생활습관 · 누르면 체크</span><span>${hbDone}/${h.habits.length}</span></div><div class="habits">${habits}</div>` : ''}
+  <div class="sec-title"><span>이번 주 깜짝 미션</span></div>
+  <div class="bonus">
+    <div class="mi" style="background:rgba(163,163,245,.16);color:var(--violet)">${ic('gift')}</div>
+    <div style="flex:1"><b style="font-size:15px">${esc(h.bonus.text)}</b><div class="small muted">일주일 동안 한 번 · +${h.bonus.xp} XP</div></div>
+    ${h.bonus.done ? `<span class="chip c-teal">${ic('check')}완료</span>` : `<button class="chip c-vio" style="padding:9px 14px" onclick="doBonus()">했어요</button>`}
+  </div>`;
+}
+
+async function readMsgs() { try { await api('markRead', S.code); S.home.messages = []; render(); } catch (e) { toast(errMsg(e)); } }
+
+async function toggleHabit(id, done) {
+  try {
+    if (done) { S.home = await api('undoHabit', S.code, id); render(); toast('체크를 취소했어요'); return; }
+    const hb = S.home.habits.find(x => x.id === id); if (hb) hb.done = true; render();
+    const res = await api('submitRecord', S.code, { kind: 'habit', item: id });
+    afterSubmit(res, true);
+  } catch (e) { toast(errMsg(e)); refresh(); }
+}
+async function doBonus() {
+  try { const res = await api('submitRecord', S.code, { kind: 'bonus' }); afterSubmit(res); }
+  catch (e) { toast(errMsg(e)); }
+}
+async function refresh() { try { S.home = await api('studentHome', S.code); render(); } catch (e) { } }
+
+/* 보상 화면 — 작은 보상은 토스트, 큰 보상(배지·레벨업·운동 완료)은 전체 화면 */
+function afterSubmit(res, light) {
+  S.home = res.home;
+  const big = !light || res.newBadges.length || res.levelAfter.level > res.levelBefore.level || res.awarded.length > 1;
+  if (!big) { render(); toast(`+${res.xpGained} XP`); return; }
+  if (S.view === 'ex') S.view = 'home';
+  render(); showReward(res);
+}
+function showReward(res) {
+  const lvUp = res.levelAfter.level > res.levelBefore.level;
+  const m = document.createElement('div');
+  m.className = 'modal center-modal';
+  m.innerHTML = `<div class="sheet reward" role="dialog" aria-label="보상">
+    <div class="small muted">잘했어요!</div>
+    <div class="xp num">+${res.xpGained} XP</div>
+    <div class="alines">${res.awarded.map(a => `<div><span>${esc(a.label)}</span><b class="num">+${a.xp}</b></div>`).join('')}</div>
+    ${lvUp ? `<div class="lvup pcard t-${res.levelAfter.tier}" style="text-align:left"><div class="tier">레벨 업!</div><div class="row" style="align-items:flex-end;gap:10px;margin-top:6px"><div class="lv">Lv.${res.levelAfter.level}</div><div class="nm">${esc(res.levelAfter.name)}</div></div>${res.levelAfter.tier !== res.levelBefore.tier ? `<div class="small" style="margin-top:6px;position:relative;z-index:1">선수 카드가 ${TIER_NAME[res.levelAfter.tier]}로 바뀌었어요</div>` : ''}</div>`
+      : `<div class="card" style="background:var(--card2);text-align:left" ><div class="row between small"><b>Lv.${res.levelAfter.level} ${esc(res.levelAfter.name)}</b><span class="muted num">${res.levelAfter.next ? (res.levelAfter.next - res.levelAfter.xp) + ' XP 남음' : 'MAX'}</span></div><div class="dark"><div class="xpbar"><i style="width:${res.levelAfter.pct}%"></i></div></div></div>`}
+    ${res.newBadges.map(b => `<div class="newbadge">${badgeSvg(b)}<div><div class="small" style="color:var(--gold);font-weight:700">새 배지 획득</div><b style="font-size:17px">${esc(b.name)}</b><div class="small muted">${esc(b.desc)}</div></div></div>`).join('')}
+    <button class="btn btn-acc" style="margin-top:16px" id="rok">확인</button></div>`;
+  document.body.appendChild(m);
+  m.querySelector('#rok').onclick = () => m.remove();
+  if (S.sound) speak(lvUp ? `레벨 업! 레벨 ${res.levelAfter.level}, ${res.levelAfter.name}` : res.newBadges.length ? `새 배지, ${res.newBadges[0].name}` : '잘했어요!', true);
+}
+
+/* ===== 운동 상세 ===== */
+function curEx() { return S.home.exercises.find(e => e.id === S.exId); }
+function viewExercise() {
+  const e = curEx(); if (!e) { S.view = 'home'; return viewHome(); }
+  const cs = CAT_STYLE[e.cat] || CAT_STYLE.cardio;
+  return `
+  <button class="back" onclick="go('home')">${ic('back')}오늘로 돌아가기</button>
+  <div class="illu">${figure(e.pic)}</div>
+  <div style="margin:16px 2px 12px">
+    <div class="row between"><h2 style="margin:0;font-size:24px;font-weight:900">${esc(e.name)} ${e.target}${esc(e.unit)}</h2>${e.done ? `<span class="chip c-teal">${ic('check')}완료</span>` : ''}</div>
+    <div class="row small" style="gap:6px;margin-top:6px;flex-wrap:wrap">
+      <span class="chip" style="background:${cs[0]};color:${cs[1]}">${CAT_NAME[e.cat] || ''}</span>
+      ${e.view ? `<span class="chip c-mute">촬영: ${esc(e.view)}</span>` : ''}
+      ${e.best ? `<span class="chip c-gold">${ic('bolt')}내 최고 ${e.best}${esc(e.unit)}</span>` : ''}
+    </div>
+  </div>
+  <div class="card"><div class="points">${e.points.map(p => `<div>${esc(p)}</div>`).join('')}</div></div>
+  <div class="stack" style="margin-top:14px;gap:10px">
+    ${e.video ? `<a class="btn btn-ghost" href="${esc(e.video)}" target="_blank" rel="noopener">${ic('play')}<span>영상으로 동작 보기</span></a>` : ''}
+    ${e.done ? `<div class="card muted small" style="text-align:center">오늘 기록: ${e.doneValue}${esc(e.unit)}${e.doneScore ? ` · 자세 ${e.doneScore}점` : ''}. 내일 또 만나요!</div>` : `
+      ${e.mode ? `<button class="btn btn-acc" onclick="startCamera()">${ic('cam')}카메라로 인증하기</button>` : ''}
+      <button class="btn ${e.mode ? 'btn-ghost' : 'btn-acc'}" onclick="selfCheck()">${ic('check')}스스로 체크하기${e.mode ? ' (+20 XP)' : ''}</button>`}
+  </div>
+  ${e.mode && !e.done ? `<p class="small muted" style="margin:14px 4px">카메라 인증을 하면 +10 XP, 자세 점수 80점 이상이면 +5 XP를 더 받아요. 폰을 바닥이나 책상에 세우고 2m쯤 뒤로 가서 ${esc(e.view || '옆모습')}이 보이게 서 주세요.</p>` : ''}`;
+}
+
+function selfCheck() {
+  const e = curEx();
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<div class="sheet" role="dialog" aria-label="스스로 체크">
+    <div class="row between"><b style="font-size:18px">${esc(e.name)} 몇 ${e.unit === '회' ? '번' : e.unit === '초' ? '초' : '분'} 했나요?</b><button onclick="this.closest('.modal').remove()" aria-label="닫기">${ic('x')}</button></div>
+    <div class="stepper"><button id="mn" aria-label="줄이기">−</button><input id="val" type="number" inputmode="numeric" value="${e.target}" aria-label="횟수"><button id="pl" aria-label="늘리기">+</button></div>
+    <p class="small muted" style="text-align:center;margin:0 0 14px">목표 ${e.target}${esc(e.unit)} · 정직하게 기록해요</p>
+    <button class="btn btn-acc" id="ok">기록하기</button></div>`;
+  document.body.appendChild(m);
+  const v = m.querySelector('#val'), step = e.unit === '회' && e.target >= 50 ? 10 : e.unit === '초' ? 5 : 1;
+  m.querySelector('#mn').onclick = () => v.value = Math.max(0, (+v.value || 0) - step);
+  m.querySelector('#pl').onclick = () => v.value = (+v.value || 0) + step;
+  m.querySelector('#ok').onclick = async ev => {
+    ev.target.disabled = true;
+    try { const res = await api('submitRecord', S.code, { kind: 'ex', item: e.id, value: +v.value, method: 'self' }); m.remove(); afterSubmit(res); }
+    catch (err) { toast(errMsg(err)); ev.target.disabled = false; }
+  };
+}
+
+/* ===== 기록 ===== */
+function viewRecord() {
+  const h = S.home;
+  const first = new Date(h.calendar[0].d + 'T00:00:00').getDay(); // 0=일
+  const pad = (first + 6) % 7;
+  const cells = Array(pad).fill('<div style="background:none"></div>').concat(h.calendar.map(c => {
+    const day = +c.d.slice(8);
+    return `<div class="${c.full ? 'f' : c.active ? 'a' : ''} ${c.d === h.today ? 'today' : ''}" title="${c.d}">${day}</div>`;
+  })).join('');
+  const cmp = h.compare.map(c => {
+    const max = Math.max(c.thisWeek, c.lastWeek, 1);
+    const diff = c.thisWeek - c.lastWeek;
+    return `<div><div class="row between"><b>${esc(c.name)}</b><span class="${diff > 0 ? 'd-good' : 'd-flat'}">${diff > 0 ? '+' + diff + c.unit + ' 더!' : diff === 0 ? '같아요' : '지난주까지 ' + (-diff) + c.unit}</span></div>
+      <div class="bars">
+        <div class="bar"><span>지난주</span><i style="width:${c.lastWeek / max * 70}%;background:var(--line)"></i><em class="num muted">${c.lastWeek}</em></div>
+        <div class="bar"><span>이번 주</span><i style="width:${c.thisWeek / max * 70}%;background:var(--accent)"></i><em class="num">${c.thisWeek}</em></div>
+      </div>${c.best ? `<div class="small muted" style="margin-top:4px">한 번에 가장 많이 한 기록 ${c.best}${esc(c.unit)}</div>` : ''}</div>`;
+  }).join('');
+  return `
+  <div class="top"><div><div class="small muted">나와의 대결</div><h1>나의 기록</h1></div></div>
+  <div class="stats">
+    <div class="stat"><small>연속 참여</small><b class="num">${h.streak}<span> 일</span></b><span class="d-flat">최고 ${h.streakBest}일</span></div>
+    <div class="stat"><small>참여한 날</small><b class="num">${h.activeDays}<span> 일</span></b></div>
+    <div class="stat"><small>완료한 운동 미션</small><b class="num">${h.missionsDone}<span> 번</span></b></div>
+    <div class="stat"><small>모은 XP</small><b class="num">${h.xp.toLocaleString()}</b></div>
+  </div>
+  <div class="sec-title"><span>최근 5주</span><span class="row" style="gap:10px"><span class="row" style="gap:4px"><i style="width:10px;height:10px;border-radius:3px;background:rgba(255,90,31,.35);display:inline-block"></i>참여</span><span class="row" style="gap:4px"><i style="width:10px;height:10px;border-radius:3px;background:var(--accent);display:inline-block"></i>모두 완료</span></span></div>
+  <div class="card"><div class="cal">${'월화수목금토일'.split('').map(x => `<div class="h">${x}</div>`).join('')}${cells}</div></div>
+  <div class="sec-title"><span>지난주의 나 vs 이번 주의 나</span></div>
+  <div class="card cmp">${cmp || '<span class="muted">목표가 생기면 비교가 시작돼요.</span>'}</div>
+  <div class="sec-title"><span>XP 받는 방법</span></div>
+  <div class="card small" style="display:grid;grid-template-columns:1fr auto;gap:6px 12px">
+    <span>운동 미션 완료</span><b class="num">+${h.xpRule.self}</b><span>카메라로 인증</span><b class="num">+${h.xpRule.camera}</b>
+    <span>자세 점수 80점 이상</span><b class="num">+${h.xpRule.posture}</b><span>생활습관 1개</span><b class="num">+${h.xpRule.habit}</b>
+    <span>오늘 할 일 모두 완료</span><b class="num">+${h.xpRule.allday}</b><span>내 최고 기록 경신</span><b class="num">+${h.xpRule.pb}</b>
+    <span>7일 연속 참여</span><b class="num">+${h.xpRule.streak7}</b><span>주간 깜짝 미션</span><b class="num">+${h.xpRule.bonus}</b>
+  </div>
+  <p class="small muted" style="margin:14px 4px">하루를 빠뜨려도 괜찮아요. 일주일에 한 번은 ‘쉬는 날 카드’가 자동으로 연속 기록을 지켜 줘요.</p>
+  <button class="btn btn-ghost small" style="margin-top:8px" onclick="logout()">다른 코드로 들어가기</button>`;
+}
+
+/* ===== 내 몸 ===== */
+const IB_UNIT = { '신장': 'cm', '체중': 'kg', '골격근량': 'kg', '체지방량': 'kg', '체지방률': '%', 'BMI': '', '인바디점수': '점' };
+const IB_LABEL = { '신장': '키', '인바디점수': '인바디 점수' };
+const IB_GOOD = { '신장': 1, '골격근량': 1, '인바디점수': 1, '체지방률': -1, '체지방량': -1 }; // 체중·BMI는 좋고 나쁨 표시 안 함
+function viewBody() {
+  const h = S.home, ib = h.inbody, F = h.inbodyFields;
+  if (!ib.length) return `<div class="top"><div><div class="small muted">인바디 측정 결과</div><h1>내 몸의 변화</h1></div></div><div class="card muted" style="text-align:center;padding:40px 16px">${ic('chart')}<br>아직 인바디 기록이 없어요.<br>선생님이 측정 결과를 입력하면 여기에 보여요.</div>`;
+  const first = ib[0], last = ib[ib.length - 1];
+  const stat = f => {
+    if (last[f] == null) return '';
+    let delta = '';
+    if (ib.length > 1 && first[f] != null) {
+      const d = Math.round((last[f] - first[f]) * 10) / 10;
+      const good = IB_GOOD[f] ? d * IB_GOOD[f] > 0 : false;
+      delta = `<span class="${good ? 'd-good' : 'd-flat'}">처음보다 ${d > 0 ? '+' : ''}${d}</span>`;
+    }
+    return `<div class="stat"><small>${IB_LABEL[f] || f}</small><b class="num">${last[f]}<span> ${IB_UNIT[f]}</span></b>${delta}</div>`;
+  };
+  const avail = F.filter(f => ib.some(r => r[f] != null));
+  if (!S.metric || avail.indexOf(S.metric) < 0) S.metric = avail.indexOf('골격근량') >= 0 ? '골격근량' : avail[0];
+  const memo = [];
+  if (ib.length > 1) {
+    if (last['신장'] != null && first['신장'] != null && last['신장'] > first['신장']) memo.push(`키가 ${Math.round((last['신장'] - first['신장']) * 10) / 10}cm 자랐어요.`);
+    if (last['골격근량'] != null && first['골격근량'] != null && last['골격근량'] > first['골격근량']) memo.push(`근육이 ${Math.round((last['골격근량'] - first['골격근량']) * 10) / 10}kg 늘었어요.`);
+  }
+  memo.push(`지금까지 운동 미션 ${h.missionsDone}번을 해냈어요. 꾸준함이 몸을 바꿔요!`);
+  return `
+  <div class="top"><div><div class="small muted">인바디 ${ib.length}회 측정 · ${ib.map(r => r.date ? (+r.date.slice(5, 7)) + '월' : r.round + '차').join(' → ')}</div><h1>내 몸의 변화</h1></div></div>
+  <div class="stats">${avail.map(stat).join('')}</div>
+  <div class="sec-title"><span>변화 그래프</span></div>
+  <div class="card">
+    <div class="seg">${avail.map(f => `<button class="${S.metric === f ? 'on' : ''}" onclick="S.metric='${f}';render()">${IB_LABEL[f] || f}</button>`).join('')}</div>
+    ${chart(ib, S.metric)}
+  </div>
+  <div class="card" style="margin-top:12px;background:rgba(63,208,181,.1)"><b style="color:var(--teal)">성장 메모</b><div style="margin-top:4px">${memo.map(esc).join('<br>')}</div></div>
+  <p class="small muted" style="margin:14px 4px">몸은 사람마다 다르게 자라요. 다른 친구와 비교하지 말고, 처음의 나와 비교해 보세요.</p>`;
+}
+function chart(ib, f) {
+  const pts = ib.filter(r => r[f] != null);
+  if (!pts.length) return '';
+  const W = 320, H = 170, pl = 40, pr = 16, pt = 18, pb = 28;
+  const vals = pts.map(r => r[f]);
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  if (hi === lo) { hi += 1; lo -= 1; }
+  const padv = (hi - lo) * 0.25; lo -= padv; hi += padv;
+  const x = i => pts.length === 1 ? (pl + W - pr) / 2 : pl + i * (W - pl - pr) / (pts.length - 1);
+  const y = v => pt + (hi - v) / (hi - lo) * (H - pt - pb);
+  const ticks = [lo, (lo + hi) / 2, hi];
+  const path = pts.map((r, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(r[f]).toFixed(1)}`).join(' ');
+  const area = pts.length > 1 ? `${path} L${x(pts.length - 1)} ${H - pb} L${x(0)} ${H - pb}Z` : '';
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="margin-top:10px" role="img" aria-label="${f} 변화 그래프">
+    ${ticks.map(t => `<line x1="${pl}" x2="${W - pr}" y1="${y(t)}" y2="${y(t)}" stroke="#28332E"/><text x="${pl - 6}" y="${y(t) + 4}" fill="#8E9C95" font-size="10" text-anchor="end">${(Math.round(t * 10) / 10)}</text>`).join('')}
+    ${area ? `<path d="${area}" fill="rgba(63,208,181,.15)"/>` : ''}
+    <path d="${path}" fill="none" stroke="#3FD0B5" stroke-width="2.5"/>
+    ${pts.map((r, i) => `<circle cx="${x(i)}" cy="${y(r[f])}" r="${i === pts.length - 1 ? 5.5 : 3.5}" fill="#3FD0B5" stroke="#151C19" stroke-width="2"/>
+      <text x="${x(i)}" y="${y(r[f]) - 10}" fill="#F2F5F3" font-size="11" font-weight="700" text-anchor="middle">${r[f]}</text>
+      <text x="${x(i)}" y="${H - 8}" fill="#8E9C95" font-size="10" text-anchor="middle">${r.date ? (+r.date.slice(5, 7)) + '월' : r.round + '차'}</text>`).join('')}
+  </svg>`;
+}
+
+/* ===== 배지 ===== */
+function viewBadges() {
+  const h = S.home;
+  const cats = [];
+  h.badges.forEach(b => { if (cats.indexOf(b.cat) < 0) cats.push(b.cat); });
+  const next = h.badges.filter(b => !b.earned && b.goal > 1).sort((a, b) => (b.cur / b.goal) - (a.cur / a.goal))[0];
+  return `
+  <div class="top"><div><div class="small muted">모은 배지</div><h1>나의 배지 <span class="num" style="color:var(--gold)">${h.badgeCount}</span><span class="muted num" style="font-size:15px"> / ${h.badges.length}</span></h1></div></div>
+  ${next ? `<div class="card row" style="gap:14px"><div style="width:60px;flex:none">${badgeSvg(next, true)}</div><div style="flex:1"><div class="small muted">다음 배지까지</div><b>${esc(next.name)}</b><div class="small muted">${esc(next.desc)}</div><div class="dark"><div class="xpbar" style="height:8px;margin-top:8px"><i style="width:${Math.round(next.cur / next.goal * 100)}%"></i></div></div><div class="small num" style="margin-top:4px">${next.cur} / ${next.goal}</div></div></div>` : ''}
+  ${cats.map(c => `<div class="sec-title"><span>${esc(c)}</span><span class="num">${h.badges.filter(b => b.cat === c && b.earned).length}/${h.badges.filter(b => b.cat === c).length}</span></div>
+    <div class="bgrid">${h.badges.filter(b => b.cat === c).map(b => `<div class="bdg ${b.earned ? '' : 'lock'}" title="${esc(b.desc)}">${badgeSvg(b, !b.earned)}<b>${esc(b.name)}</b><small>${b.earned ? esc(b.date.slice(5).replace('-', '/')) + ' 획득' : esc(b.desc)}</small>${!b.earned && b.goal > 1 ? `<div class="p"><i style="width:${Math.round(b.cur / b.goal * 100)}%"></i></div>` : ''}</div>`).join('')}</div>`).join('')}`;
+}
+
+/* ===================== 카메라 · 자세 분석 ===================== */
+let landmarker = null;
+async function loadPose() {
+  if (landmarker) return landmarker;
+  const vision = await import(MP_BASE + '/vision_bundle.mjs');
+  const files = await vision.FilesetResolver.forVisionTasks(MP_BASE + '/wasm');
+  const opt = delegate => ({ baseOptions: { modelAssetPath: POSE_MODEL, delegate }, runningMode: 'VIDEO', numPoses: 1, minPoseDetectionConfidence: 0.5, minPosePresenceConfidence: 0.5, minTrackingConfidence: 0.5 });
+  try { landmarker = await vision.PoseLandmarker.createFromOptions(files, opt('GPU')); }
+  catch (e) { landmarker = await vision.PoseLandmarker.createFromOptions(files, opt('CPU')); }
+  return landmarker;
+}
+
+/* 각도 계산 도구 (픽셀 좌표 기준) */
+const G = {
+  ang(a, b, c) { const v1x = a.x - b.x, v1y = a.y - b.y, v2x = c.x - b.x, v2y = c.y - b.y; const d = (v1x * v2x + v1y * v2y) / ((Math.hypot(v1x, v1y) * Math.hypot(v2x, v2y)) || 1); return Math.acos(Math.max(-1, Math.min(1, d))) * 180 / Math.PI; },
+  tilt(top, bottom) { return Math.abs(Math.atan2(top.x - bottom.x, bottom.y - top.y)) * 180 / Math.PI; }, // 세로선에서 기운 정도
+  dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); },
+  vis(pts, t) { return pts.every(p => p && p.v > (t || 0.5)); },
+  side(p) {
+    const L = [11, 13, 15, 23, 25, 27, 31], R = [12, 14, 16, 24, 26, 28, 32];
+    const sv = a => a.reduce((s, i) => s + p[i].v, 0);
+    const S2 = sv(L) >= sv(R) ? L : R;
+    return { s: p[S2[0]], e: p[S2[1]], w: p[S2[2]], h: p[S2[3]], k: p[S2[4]], a: p[S2[5]], f: p[S2[6]] };
+  }
+};
+const MSG = {
+  notvis: '몸 전체가 화면에 보이게 뒤로 가요',
+  knee: '무릎이 발끝보다 나왔어요. 엉덩이를 뒤로!',
+  lean: '가슴을 펴고 상체를 세워요',
+  squat_partial: '조금 더 깊게 앉아요',
+  torso: '상체를 곧게 세워요',
+  lunge_partial: '조금 더 깊게 내려가요',
+  hip_high: '엉덩이를 조금 내려요',
+  hip_low: '배에 힘! 엉덩이를 올려요',
+  push_partial: '가슴을 더 내려요',
+  pose_down: '엎드린 자세로 옆모습을 보여 주세요',
+  plank_pose: '플랭크 자세를 잡아 주세요 (옆모습)',
+  situp_partial: '조금 더 올라와요',
+  knees_bent: '무릎을 세우고 해요',
+  jack_partial: '팔을 머리 위까지 쭉!',
+  good: ['좋아요!', '완벽해요!', '자세 최고!', '그대로 계속!']
+};
+/* 운동별 판정: frame(p) → { st: 'active'|'rest'|'partial'|'mid'|null, faults:[], label, at, hint } */
+const ANALYZERS = {
+  squat: {
+    type: 'rep', partialMsg: 'squat_partial',
+    frame(p) {
+      const j = G.side(p); if (!G.vis([j.s, j.h, j.k, j.a])) return null;
+      const m = G.ang(j.h, j.k, j.a);
+      const st = m < 100 ? 'active' : m > 155 ? 'rest' : m < 135 ? 'partial' : 'mid';
+      const faults = [];
+      if (st !== 'rest') {
+        const facing = Math.sign(j.f.x - j.a.x) || 1;
+        if (j.f.v > 0.4 && (j.k.x - j.f.x) * facing > 0.2 * G.dist(j.k, j.a)) faults.push('knee');
+        if (m < 130 && G.tilt(j.s, j.h) > 50) faults.push('lean');
+      }
+      return { st, faults, label: `무릎 ${Math.round(m)}°`, at: j.k };
+    }
+  },
+  lunge: {
+    type: 'rep', partialMsg: 'lunge_partial',
+    frame(p) {
+      const j = G.side(p); if (!G.vis([j.s, j.h, j.k, j.a])) return null;
+      const angs = [];
+      if (G.vis([p[23], p[25], p[27]], 0.3)) angs.push(G.ang(p[23], p[25], p[27]));
+      if (G.vis([p[24], p[26], p[28]], 0.3)) angs.push(G.ang(p[24], p[26], p[28]));
+      const m = Math.min(...angs);
+      const st = m < 105 ? 'active' : m > 150 ? 'rest' : m < 130 ? 'partial' : 'mid';
+      const faults = (st !== 'rest' && G.tilt(j.s, j.h) > 30) ? ['torso'] : [];
+      return { st, faults, label: `무릎 ${Math.round(m)}°`, at: j.k };
+    }
+  },
+  pushup: {
+    type: 'rep', partialMsg: 'push_partial',
+    frame(p) {
+      const j = G.side(p); if (!G.vis([j.s, j.e, j.w, j.h, j.k])) return null;
+      if (G.tilt(j.s, j.k) < 45) return { st: null, faults: [], hint: 'pose_down' };
+      const m = G.ang(j.s, j.e, j.w);
+      const st = m < 95 ? 'active' : m > 150 ? 'rest' : m < 125 ? 'partial' : 'mid';
+      const faults = [];
+      if (G.ang(j.s, j.h, j.k) < 150) {
+        const lineY = j.s.y + (j.k.y - j.s.y) * (j.h.x - j.s.x) / ((j.k.x - j.s.x) || 1);
+        faults.push(j.h.y < lineY ? 'hip_high' : 'hip_low');
+      }
+      return { st, faults, label: `팔꿈치 ${Math.round(m)}°`, at: j.e };
+    }
+  },
+  situp: {
+    type: 'rep', partialMsg: 'situp_partial',
+    frame(p) {
+      const j = G.side(p); if (!G.vis([j.s, j.h, j.k])) return null;
+      const m = G.ang(j.s, j.h, j.k);
+      const st = m < 75 ? 'active' : m > 110 ? 'rest' : m < 95 ? 'partial' : 'mid';
+      const faults = (j.a.v > 0.5 && G.ang(j.h, j.k, j.a) > 140) ? ['knees_bent'] : [];
+      return { st, faults, label: `상체 ${Math.round(m)}°`, at: j.h };
+    }
+  },
+  jack: {
+    type: 'rep', partialMsg: 'jack_partial',
+    frame(p) {
+      if (!G.vis([p[0], p[11], p[12], p[15], p[16], p[27], p[28]])) return null;
+      const sw = G.dist(p[11], p[12]) || 1, ad = G.dist(p[27], p[28]);
+      const up = p[15].y < p[0].y && p[16].y < p[0].y;
+      const down = p[15].y > p[11].y && p[16].y > p[12].y;
+      const open = ad > sw * 1.3, closed = ad < sw * 1.05;
+      const st = up && open ? 'active' : down && closed ? 'rest' : (open && !up) ? 'partial' : 'mid';
+      return { st, faults: [], label: '', at: null };
+    }
+  },
+  plank: {
+    type: 'hold',
+    frame(p) {
+      const j = G.side(p); if (!G.vis([j.s, j.h, j.a])) return null;
+      const horizontal = G.tilt(j.s, j.a) > 60;
+      if (!horizontal) return { st: null, faults: [], hint: 'plank_pose' };
+      const line = G.ang(j.s, j.h, j.a);
+      const faults = [];
+      if (line < 160) {
+        const lineY = j.s.y + (j.a.y - j.s.y) * (j.h.x - j.s.x) / ((j.a.x - j.s.x) || 1);
+        faults.push(j.h.y < lineY ? 'hip_high' : 'hip_low');
+      }
+      return { st: faults.length ? 'bad' : 'good', faults, label: `몸 ${Math.round(line)}°`, at: j.h };
+    }
+  }
+};
+
+/* 횟수 세기·점수 매기기 엔진 */
+class Coach {
+  constructor(mode) {
+    this.A = ANALYZERS[mode]; this.mode = mode;
+    this.count = 0; this.phase = 'rest'; this.partial = false;
+    this.repFaults = new Set(); this.ff = {}; this.scores = []; this.tally = {};
+    this.holdGood = 0; this.holdTotal = 0;
+  }
+  step(p, dt) {
+    const r = this.A.frame(p);
+    if (!r) return { event: 'notvis' };
+    if (r.st === null) return { event: 'hint', hint: r.hint };
+    // 3프레임 이상 이어진 실수만 인정 (순간적인 흔들림 무시)
+    const now = [];
+    Object.keys(this.ff).forEach(k => { if (r.faults.indexOf(k) < 0) this.ff[k] = 0; });
+    r.faults.forEach(f => { this.ff[f] = (this.ff[f] || 0) + 1; if (this.ff[f] >= 3) now.push(f); });
+    const out = { event: 'frame', faults: now, label: r.label, at: r.at };
+    if (this.A.type === 'hold') {
+      this.holdTotal += dt;
+      if (r.st === 'good' || !now.length) this.holdGood += dt;
+      now.forEach(f => this.tally[f] = (this.tally[f] || 0) + dt);
+      const c = Math.floor(this.holdGood);
+      if (c > this.count) { this.count = c; out.tick = true; }
+      return out;
+    }
+    if (this.phase !== 'rest' || r.st !== 'rest') now.forEach(f => this.repFaults.add(f));
+    if (r.st === 'active' && this.phase === 'rest') { this.phase = 'active'; this.partial = false; }
+    else if (r.st === 'partial' && this.phase === 'rest') this.partial = true;
+    else if (r.st === 'rest' && this.phase === 'active') {
+      this.count++;
+      const sc = Math.max(50, 100 - this.repFaults.size * 25);
+      this.scores.push(sc);
+      this.repFaults.forEach(f => this.tally[f] = (this.tally[f] || 0) + 1);
+      out.rep = true; out.repGood = this.repFaults.size === 0; out.repFaults = [...this.repFaults];
+      this.repFaults.clear(); this.phase = 'rest';
+    } else if (r.st === 'rest' && this.phase === 'rest' && this.partial) {
+      this.partial = false; this.repFaults.clear();
+      out.shallow = this.A.partialMsg;
+    }
+    return out;
+  }
+  score() {
+    if (this.A.type === 'hold') return this.holdTotal ? Math.round(this.holdGood / this.holdTotal * 100) : 0;
+    return this.scores.length ? Math.round(this.scores.reduce((a, b) => a + b, 0) / this.scores.length) : 0;
+  }
+  topFault() { const k = Object.keys(this.tally).sort((a, b) => this.tally[b] - this.tally[a])[0]; return k ? MSG[k] : null; }
+}
+
+/* 소리 안내 */
+let lastSpeak = 0;
+function speak(text, force) {
+  if (!S.sound || !('speechSynthesis' in window)) return;
+  const t = performance.now();
+  if (!force && t - lastSpeak < 2200) return;
+  lastSpeak = t;
+  try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'ko-KR'; u.rate = 1.1; speechSynthesis.speak(u); } catch (e) { }
+}
+
+const CONN = [[11, 12], [11, 13], [13, 15], [12, 14], [14, 16], [11, 23], [12, 24], [23, 24], [23, 25], [25, 27], [27, 31], [24, 26], [26, 28], [28, 32]];
+const CAM = { running: false };
+
+async function startCamera() {
+  const e = curEx();
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { toast('이 브라우저에서는 카메라를 쓸 수 없어요. 스스로 체크를 이용해 주세요.'); return; }
+  const wrap = document.createElement('div'); wrap.className = 'camwrap'; wrap.id = 'cam';
+  wrap.innerHTML = `
+    <div class="stage">
+      <video id="vid" playsinline muted></video><canvas id="cv"></canvas>
+      <div class="hud">
+        <div class="count num" id="cnt">0<small> / ${e.target}${e.unit === '초' ? '초' : ''}</small></div>
+        <div class="privacy"><i></i>기기 안에서만 분석 · 저장 안 함</div>
+        <div class="score" id="scr">자세 점수<b class="num">–</b></div>
+        <div class="center" id="ctr"><div><div class="spin"></div><div id="ctrtxt" style="font-weight:700">AI 코치를 준비하고 있어요…</div></div></div>
+        <div class="fb info" id="fb">${ic('alert')}<span id="fbt">${esc(e.view || '옆모습')}이 보이게 폰에서 2m 뒤로 서 주세요</span></div>
+      </div>
+    </div>
+    <div class="camctl">
+      <button class="sq" id="cx" aria-label="그만하기">${ic('x')}</button>
+      <button class="sq" id="cflip" aria-label="카메라 바꾸기">${ic('flip')}</button>
+      <button class="sq" id="csnd" aria-label="소리 켜기/끄기">${ic(S.sound ? 'sound' : 'mute')}</button>
+      <button class="btn btn-acc" id="cgo" style="flex:1">바로 시작</button>
+    </div>`;
+  document.body.appendChild(wrap);
+  Object.assign(CAM, { ex: e, facing: 'user', coach: new Coach(e.mode), state: 'loading', readyFrames: 0, lastT: -1, lastTs: 0, goalShown: false, wake: null, stream: null });
+  $('#cx').onclick = () => stopCamera(false);
+  $('#csnd').onclick = () => { S.sound = !S.sound; store.set('fitup_sound', S.sound ? 'on' : 'off'); $('#csnd').innerHTML = ic(S.sound ? 'sound' : 'mute'); };
+  $('#cflip').onclick = async () => { CAM.facing = CAM.facing === 'user' ? 'environment' : 'user'; await openStream(); };
+  $('#cgo').onclick = () => { if (CAM.state === 'position') countdown(); else if (CAM.state === 'run') stopCamera(true); };
+  try { if ('wakeLock' in navigator) CAM.wake = await navigator.wakeLock.request('screen'); } catch (err) { }
+  try {
+    await openStream();
+    await loadPose();
+  } catch (err) {
+    stopCamera(false);
+    toast(/Permission|NotAllowed/i.test(String(err && err.name) + String(err)) ? '카메라 권한이 필요해요. 브라우저 설정에서 허용해 주세요.' : 'AI 코치를 불러오지 못했어요. 인터넷 연결을 확인하거나 스스로 체크를 이용해 주세요.');
+    return;
+  }
+  CAM.state = 'position'; CAM.running = true;
+  $('#ctr').innerHTML = '';
+  setFb('info', `${e.view || '옆모습'}이 보이게 서 주세요. 몸이 다 보이면 자동으로 시작해요`);
+  requestAnimationFrame(loop);
+}
+async function openStream() {
+  if (CAM.stream) CAM.stream.getTracks().forEach(t => t.stop());
+  const v = $('#vid');
+  CAM.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: CAM.facing, width: { ideal: 960 }, height: { ideal: 720 } }, audio: false });
+  v.srcObject = CAM.stream; await v.play();
+  const mirror = CAM.facing === 'user';
+  v.classList.toggle('mirror', mirror); $('#cv').classList.toggle('mirror', mirror);
+}
+function setFb(type, text) {
+  const fb = $('#fb'); if (!fb) return;
+  fb.className = 'fb ' + type;
+  fb.innerHTML = ic(type === 'good' ? 'check' : 'alert') + `<span>${esc(text)}</span>`;
+}
+function countdown() {
+  CAM.state = 'countdown';
+  $('#cgo').textContent = '준비…';
+  let n = 3;
+  const tick = () => {
+    if (!CAM.running) return;
+    if (n === 0) { $('#ctr').innerHTML = ''; CAM.state = 'run'; CAM.coach = new Coach(CAM.ex.mode); $('#cgo').textContent = '끝내고 저장'; setFb('info', '시작!'); speak('시작!', true); return; }
+    $('#ctr').innerHTML = `<div class="big num">${n}</div>`; speak(String(n), true); n--; setTimeout(tick, 900);
+  };
+  tick();
+}
+function loop() {
+  if (!CAM.running) return;
+  const v = $('#vid'), cv = $('#cv');
+  if (v && v.readyState >= 2 && v.currentTime !== CAM.lastT) {
+    CAM.lastT = v.currentTime;
+    const ts = performance.now();
+    let res = null;
+    try { res = landmarker.detectForVideo(v, ts); } catch (err) { }
+    const dt = CAM.lastTs ? Math.min(0.2, (ts - CAM.lastTs) / 1000) : 0; CAM.lastTs = ts;
+    if (cv.width !== v.videoWidth) { cv.width = v.videoWidth; cv.height = v.videoHeight; }
+    const ctx = cv.getContext('2d'); ctx.clearRect(0, 0, cv.width, cv.height);
+    const lm = res && res.landmarks && res.landmarks[0];
+    if (lm) {
+      const p = lm.map(l => ({ x: l.x * cv.width, y: l.y * cv.height, v: l.visibility == null ? 1 : l.visibility }));
+      handleFrame(p, dt, ctx);
+    } else if (CAM.state === 'position' || CAM.state === 'run') { setFb('info', MSG.notvis); CAM.readyFrames = 0; }
+  }
+  requestAnimationFrame(loop);
+}
+function handleFrame(p, dt, ctx) {
+  const C = CAM.coach, e = CAM.ex;
+  if (CAM.state === 'position') {
+    const r = C.A.frame(p);
+    drawSkel(ctx, p, [], null);
+    if (r && r.st !== null) { CAM.readyFrames++; setFb('good', '준비 완료! 곧 시작해요'); if (CAM.readyFrames > 25) countdown(); }
+    else { CAM.readyFrames = 0; setFb('info', r && r.hint ? MSG[r.hint] : MSG.notvis); }
+    return;
+  }
+  if (CAM.state !== 'run') { drawSkel(ctx, p, [], null); return; }
+  const out = C.step(p, dt);
+  if (out.event === 'notvis') { setFb('info', MSG.notvis); drawSkel(ctx, p, [], null); return; }
+  if (out.event === 'hint') { setFb('info', MSG[out.hint]); drawSkel(ctx, p, [], null); return; }
+  drawSkel(ctx, p, out.faults, out);
+  // 화면 표시
+  const unitTxt = e.unit === '초' ? '초' : '';
+  $('#cnt').innerHTML = `${C.count}<small> / ${e.target}${unitTxt}</small>`;
+  const sc = C.score();
+  if (C.scores.length || C.A.type === 'hold') $('#scr').innerHTML = `자세 점수<b class="num" style="color:${sc >= 80 ? 'var(--teal)' : 'var(--gold)'}">${sc}</b>`;
+  if (out.faults.length) { setFb('bad', MSG[out.faults[0]]); speak(MSG[out.faults[0]]); }
+  else if (out.shallow) { setFb('bad', MSG[out.shallow]); speak(MSG[out.shallow]); }
+  else if (out.rep) {
+    if (out.repGood) setFb('good', MSG.good[C.count % MSG.good.length]); else setFb('bad', MSG[out.repFaults[0]]);
+    speak(String(C.count), true);
+  } else if (out.tick && C.count % 5 === 0) speak(C.count + '초', true);
+  if (!CAM.goalShown && C.count >= e.target) {
+    CAM.goalShown = true;
+    $('#ctr').innerHTML = '<div class="goal">목표 달성! 더 해도 좋아요</div>';
+    setTimeout(() => { const c = $('#ctr'); if (c) c.innerHTML = ''; }, 2200);
+    speak('목표 달성! 더 해서 최고 기록에 도전해 봐요', true);
+  }
+}
+function drawSkel(ctx, p, faults, out) {
+  const bad = faults && faults.length;
+  ctx.lineWidth = Math.max(4, ctx.canvas.width / 160); ctx.lineCap = 'round';
+  CONN.forEach(([a, b]) => {
+    if (p[a].v < 0.4 || p[b].v < 0.4) return;
+    ctx.strokeStyle = bad ? 'rgba(255,90,31,.95)' : 'rgba(63,208,181,.95)';
+    ctx.beginPath(); ctx.moveTo(p[a].x, p[a].y); ctx.lineTo(p[b].x, p[b].y); ctx.stroke();
+  });
+  ctx.fillStyle = '#fff';
+  [0, 11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28].forEach(i => { if (p[i].v >= 0.4) { ctx.beginPath(); ctx.arc(p[i].x, p[i].y, ctx.lineWidth * 1.1, 0, Math.PI * 2); ctx.fill(); } });
+  if (out && out.at && out.label) {
+    const fs = Math.max(18, ctx.canvas.width / 30);
+    ctx.save(); ctx.translate(out.at.x, out.at.y);
+    if (CAM.facing === 'user') ctx.scale(-1, 1); // 거울 화면에서도 글자가 바로 보이게
+    ctx.font = `700 ${fs}px "Noto Sans KR", sans-serif`; ctx.fillStyle = '#FFC24D';
+    ctx.fillText(out.label, fs * 0.8, fs * 0.4); ctx.restore();
+  }
+}
+async function stopCamera(save) {
+  CAM.running = false;
+  const C = CAM.coach, e = CAM.ex;
+  if (CAM.stream) CAM.stream.getTracks().forEach(t => t.stop());
+  try { if (CAM.wake) CAM.wake.release(); } catch (err) { }
+  const w = $('#cam'); if (w) w.remove();
+  if (!save) return;
+  if (!C || C.count <= 0) { toast('아직 센 횟수가 없어요. 다시 도전해 볼까요?'); return; }
+  const tip = C.topFault();
+  try {
+    const res = await api('submitRecord', S.code, { kind: 'ex', item: e.id, value: C.count, method: 'camera', score: C.score() });
+    afterSubmit(res);
+    if (tip) setTimeout(() => toast('다음엔 이것만 기억해요: ' + tip), 400);
+  } catch (err) { toast(errMsg(err)); }
+}
+
+/* ===== 시작 ===== */
+(async function init() {
+  if (!S.code) { render(); return; }
+  try { S.home = await api('studentHome', S.code); } catch (e) { S.home = null; }
+  render();
+})();
+</script>
+</body>
+</html>
